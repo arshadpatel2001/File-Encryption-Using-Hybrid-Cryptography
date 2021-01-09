@@ -1,9 +1,4 @@
- /*This Class Contains 04 Functions for RSA encryption::
-	 * phi function
-	 * privatekey Function
-	 * EncDec function
-	 * WriteEncKey function
-	 */	
+
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -63,28 +58,30 @@ public class RsaFunctionClass {
 	    	
 	        }
 
-	static public BigInteger EncDec(BigInteger m_c, BigInteger e_d, BigInteger n){
+	//Generates RSA key from simple key.
+	static public BigInteger EncDec(BigInteger k, BigInteger e, BigInteger n){
 
 		BigInteger zero = new BigInteger("0");
 		BigInteger one = new BigInteger("1");
 		BigInteger two = one.add(one);
 
 		// Base Case
-		if (e_d.equals(zero))
+		if (e.equals(zero))
 			return one;				//m^e mod n-->e=0
-		if (e_d.equals(one))
-			return m_c.mod(n);		//m^e mod n-->e=1
+		if (e.equals(one))
+			return k.mod(n);		//m^e mod n-->e=1
 
-		if (e_d.mod(two).equals(zero)) {
+		if (e.mod(two).equals(zero)) {
 			// Calculates the square root of the answer
-			BigInteger answer = EncDec(m_c, e_d.divide(two), n);
+			BigInteger answer = EncDec(k, e.divide(two), n);
 			// Reuses the result of the square root
 			return (answer.multiply(answer)).mod(n);
 		}
 
-		return (m_c.multiply(EncDec(m_c,e_d.subtract(one),n))).mod(n);
+		return (k.multiply(EncDec(k,e.subtract(one),n))).mod(n);
 	}
 
+	//Stores the RSA-Key in text file and returns its location.
 	public static String WriteEncKey(BigInteger Enkey,String dirname,String filename){
 		String returnname="",name="";
 		filename=filename.substring(filename.lastIndexOf("/")+1);
