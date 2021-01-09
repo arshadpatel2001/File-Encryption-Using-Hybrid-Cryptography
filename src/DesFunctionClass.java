@@ -1,45 +1,45 @@
-/*This Class Contains 02 Functions:
- * Encryption Function
- * Decryption Function
- */
-	import java.io.File;
+
+import java.io.File;
 	import java.io.IOException;
 	import java.io.RandomAccessFile;
 	import java.util.Scanner;
 
-public class EncDec {
-	int shiftby=2;String key="";
+public class DesFunctionClass {
 
-	double percent;
+	int shiftby=2;
 
 	Scanner inputscanner =new Scanner(System.in);
 
-	void encrypt(String filename,String dirname,String key)	{		//encrypt function
+	//encrypt function.
+	void encrypt(String filename,String dirname,String key)	{
 			try{
 				File dir = new File("TempFiles");
 				if(!dir.exists())
-					dir.mkdir();			//make a folder(if donot exist) for temporary files which will b deleted at end of prg
+					dir.mkdir();			//make a folder(if do not exist) for temporary files
 				System.out.println("Enter Name for the Encrypted File:");
 				String name = inputscanner.nextLine();
 				RandomAccessFile fn = new RandomAccessFile(filename, "rw");  
-				RandomAccessFile in = new RandomAccessFile("TempFiles/cp-temp.ars", "rw");
+				RandomAccessFile inTemp = new RandomAccessFile("TempFiles/cp-temp.ars", "rw");
 				RandomAccessFile outTemp = new RandomAccessFile("TempFiles/enc-T.ars", "rw");
 				RandomAccessFile out = new RandomAccessFile(dirname+"/"+name+".ars", "rw");
 				
-				FunctionSet.copyFile(filename, "TempFiles/cp-temp.ars");//Faster FileCopy using File Channels
+				HelperFunctions.copyFile(filename, "TempFiles/cp-temp.ars");//Copying File to be encrypted into temp file (in).
 
-				FunctionSet.rounds(in, outTemp, key, shiftby,"Encrypting");	//xor
+				HelperFunctions.rounds(inTemp, outTemp, key, shiftby,"Encrypting");//XOR
 
-				FunctionSet.shuffle(outTemp, out);		//shuffle
-				
+				HelperFunctions.shuffle(outTemp, out);//shuffle->Simple reversing of outTemp
+
+				//Release Resources
+				fn.close();
+				inTemp.close();
+				outTemp.close();
+				out.close();
+
 				File f1 = new File("TempFiles/cp-temp.ars");
 				File f2 = new File("TempFiles/enc-T.ars");
 				f1.delete();
 				f2.delete();
-				
-		    	 fn.close();
-		    	 in.close();
-		    	 out.close();	//Release Resources
+
 		    	}    	
 		catch ( IOException e) {
 			System.out.println(e);
@@ -58,8 +58,13 @@ public class EncDec {
 			RandomAccessFile in = new RandomAccessFile("TempFiles/cp-temp.ars", "rw");
 			RandomAccessFile out = new RandomAccessFile(dirname+"/"+name+"."+extname, "rw");
 
-			FunctionSet.shuffle(fn, in);							//deshuffle
-			FunctionSet.rounds(in, out, key, shiftby,"Decrypting");	//xor
+			HelperFunctions.shuffle(fn, in);//deshuffle
+			HelperFunctions.rounds(in, out, key, shiftby,"Decrypting");//XOR
+
+			//release resources
+			in.close();
+			out.close();
+			fn.close();
 
 			File f = new File("TempFiles/cp-temp.ars");
 			f.delete();
@@ -69,17 +74,14 @@ public class EncDec {
 			if(inputscanner.hasNextInt())
 			{
 				opt=inputscanner.nextInt();
-				FunctionSet.delencf(filename,opt);
+				HelperFunctions.delencf(filename,opt);
 			}
 			else
 				System.out.println("Wrong Option!");
-			//release resources
-			in.close();
-			out.close();
-			fn.close();
 		}
 		catch ( IOException e) {
 			System.out.println(e);
 		}
 	}
+
 }
